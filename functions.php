@@ -55,19 +55,36 @@ function deleteFile( $dir  , $imagename){
 
   
 }
+
+function getUserIdFromToken(){
+
+    global $con;
+
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+
+    if($header == ''){
+        return 0;
+    }
+
+    $token = str_replace("Bearer ", "", $header);
+
+
+    $stmt = $con->prepare(
+        "SELECT id FROM users WHERE token = ?"
+    );
+
+    $stmt->execute([$token]);
+
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+    if($user){
+        return $user['id'];
+    }
+
+    return 0;
+}
+
+
+
  
-
-  // function checkAuthenticate(){
-  //     if (isset($_SERVER['PHP_AUTH_USER'])  &&  isset($_SERVER['PHP_AUTH_PW'])){
-            
-  //           if($_SERVER['PHP_AUTH_USER'] != "mo" || $_SERVER['PHP_AUTH_PW'] != "123" ){
-  //             header('WWW-Authenticate: Basic realm="My Realm"');
-  //             header('HTTP/1.0 401 Unauthorized');
-  //             echo 'Page Not Found - functions.php:66';
-  //             exit;
-  //           }
-
-  //     }else{
-  //       exit;
-  //     }
-  // }

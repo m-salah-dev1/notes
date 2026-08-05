@@ -3,8 +3,8 @@
 include "../connect.php";
 
 
+$userid    = getUserIdFromToken();
 $noteid    = filterRequest("id");
-$userid    = filterRequest("userid");
 
 $title     = filterRequest("title");
 $content   = filterRequest("content");

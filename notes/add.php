@@ -8,7 +8,7 @@ include "../connect.php";
 
 $title   = filterRequest("title");
 $content = filterRequest("content");
-$userid  = filterRequest("id");
+$userid  = getUserIdFromToken();
 
 $imagename = imageUpload("file");
 

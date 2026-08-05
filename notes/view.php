@@ -2,7 +2,8 @@
 
 include"../connect.php";
 
-$userid   = filterRequest("id"); 
+$userid   = getUserIdFromToken();
+
 
 
 $stmt = $con->prepare(

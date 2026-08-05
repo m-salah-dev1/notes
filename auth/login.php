@@ -1,23 +1,61 @@
-<?php 
+<?php
 
-include"../connect.php";
+include "../connect.php";
 
-$email    = filterRequest("email"); 
-$password = filterRequest("password");
+$firebase_uid = filterRequest("firebase_uid");
+
+
 
 $stmt = $con->prepare(
-     "  SELECT  * FROM users WHERE `password` = ? AND email = ?  ");
+    "SELECT id, username, email
+    FROM users
+    WHERE firebase_uid = ?"
+);
 
-$stmt->execute(array($password , $email));
+
+$stmt->execute([
+    $firebase_uid
+]);
 
 
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$count = $stmt->rowCount();
-if($count > 0){
 
-echo json_encode(  array( "status"=>"success"  , "data" => $data ));
 
-}else{
-    echo json_encode(array ("status"=>"failure"));
+if ($data) {
+
+
+    $token = bin2hex(random_bytes(32));
+
+
+    $update = $con->prepare(
+        "UPDATE users SET token = ? WHERE id = ?"
+    );
+
+
+    $update->execute([
+        $token,
+        $data["id"]
+    ]);
+
+
+
+    echo json_encode([
+        "status" => "success",
+        "token" => $token,
+        "data" => $data
+    ]);
+
+
+
+} else {
+
+
+    echo json_encode([
+        "status" => "failure",
+        "message" => "User not found"
+    ]);
+
 }
+
+?>

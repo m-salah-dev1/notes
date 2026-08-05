@@ -1,24 +1,56 @@
-<?php 
+<?php
 
-include"../connect.php";
+include "../connect.php";
 
 $username = filterRequest("username");
-$email    = filterRequest("email"); 
-$password = filterRequest("password");
+$email = filterRequest("email");
+$firebase_uid = filterRequest("firebase_uid");
 
 $stmt = $con->prepare(
-     "INSERT INTO users 
-                 ( `username`, `email`, `password`) 
-            VALUES 
-                 (?,?,?)  ");
+    "SELECT id FROM users WHERE firebase_uid = ?"
+);
 
-$stmt->execute(array($username, $email, $password));
+$stmt->execute([
+    $firebase_uid
+]);
 
-$count = $stmt->rowCount();
-if($count > 0){
 
-echo json_encode(array( "status"=>"success") );
+if ($stmt->rowCount() > 0) {
 
-}else{
-    echo json_encode(array("status"=>"fail"));
+    echo json_encode([
+        "status" => "failure",
+        "message" => "User already exists"
+    ]);
+
+    exit;
 }
+
+$insert = $con->prepare("
+INSERT INTO users
+(username, email, firebase_uid)
+VALUES (?, ?, ?)
+");
+
+
+$insert->execute([
+    $username,
+    $email,
+    $firebase_uid
+]);
+
+
+
+if ($insert->rowCount() > 0) {
+
+    echo json_encode([
+        "status" => "success"
+    ]);
+
+} else {
+
+    echo json_encode([
+        "status" => "failure"
+    ]);
+}
+
+?>
